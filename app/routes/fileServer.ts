@@ -24,7 +24,7 @@ module.exports = function servePublicFiles () {
   }
 
   function verify (file: string, res: Response, next: NextFunction) {
-    if (file && (endsWithAllowlistedFileType(file) || (file === 'incident-support.kdbx'))) {
+    if (file && ((endsWithAllowlistedFileType(file) && isFileNameAllowed(file)) || (file === 'incident-support.kdbx'))) {
       file = security.cutOffPoisonNullByte(file)
 
       challengeUtils.solveIf(challenges.directoryListingChallenge, () => { return file.toLowerCase() === 'acquisitions.md' })
@@ -48,7 +48,11 @@ module.exports = function servePublicFiles () {
         challenges.misplacedSignatureFileChallenge.solved || file.toLowerCase() === 'encrypt.pyc'
     })
   }
-
+  
+  function isFileNameAllowed(param: string){
+    console.log("check")
+    return /^[a-z0-9]+$/.test(param)
+  }
   function endsWithAllowlistedFileType (param: string) {
     return utils.endsWith(param, '.md') || utils.endsWith(param, '.pdf')
   }
